@@ -16,13 +16,13 @@ A chaotic spell generator for tabletop role-playing games. Players choose keywor
 
 ## 🛠 Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Framework | React 19 |
-| Language | TypeScript ~5.9 |
-| Build | Vite 7 |
-| Styling | CSS (custom properties, no framework) |
-| Data | Static JSON (100 spell effects) |
+| Layer     | Technology                            |
+| --------- | ------------------------------------- |
+| Framework | React 19                              |
+| Language  | TypeScript ~5.9                       |
+| Build     | Vite 7                                |
+| Styling   | CSS (custom properties, no framework) |
+| Data      | Static JSON (100 spell effects)       |
 
 ## 🚀 Getting Started
 
@@ -49,12 +49,12 @@ The app will be available at `http://localhost:5173`.
 
 ### Available Scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start Vite dev server with HMR |
-| `npm run build` | Type-check and build for production |
-| `npm run preview` | Preview the production build locally |
-| `npm run diagnostic` | Run engine diagnostics and coverage report |
+| Command                     | Description                                      |
+| --------------------------- | ------------------------------------------------ |
+| `npm run dev`               | Start Vite dev server with HMR                   |
+| `npm run build`             | Type-check and build for production              |
+| `npm run preview`           | Preview the production build locally             |
+| `npm run diagnostic`        | Run engine diagnostics and coverage report       |
 | `npm run test-distribution` | Test the random distribution of the Chaos Engine |
 
 ## 📁 Project Structure
@@ -96,7 +96,7 @@ scripts/
 
 ## 🎲 How the Chaos Engine Works
 
-1. **Roll** — Two d100-style rolls are made: a *relevance roll* and a *power accuracy roll*. Adversity tokens add +0.1 each.
+1. **Roll** — Two d100-style rolls are made: a _relevance roll_ and a _power accuracy roll_. Adversity tokens add +0.1 each.
 2. **Band** — Each roll falls into a band: crit success (top 10%), narrow (60–90%), wide (10–60%), or crit fail (bottom 10%).
 3. **Score** — Every spell is scored on proximity (keyword match × 0.5 + impulse match × 0.35 + intent match × 0.15) and power distance.
 4. **Filter** — Spells outside the power accuracy band are filtered out.
@@ -112,6 +112,7 @@ scripts/
 ### Spell Discovery
 
 Spells #95–100 are "top-tier" and resist manifestation:
+
 - **Undiscovered** → 2/3 chance of fizzling (spell fails to manifest)
 - **Discovered** → Always casts successfully once revealed
 
