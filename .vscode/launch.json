@@ -1,0 +1,33 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Dev Server",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev",
+      "cwd": "${workspaceFolder}/wildmagic-generator"
+    },
+    {
+      "name": "Dev Server (with host)",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npx vite --host",
+      "cwd": "${workspaceFolder}/wildmagic-generator"
+    },
+    {
+      "name": "Diagnostic Check",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run diagnostic",
+      "cwd": "${workspaceFolder}/wildmagic-generator"
+    },
+    {
+      "name": "Distribution Test",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run test-distribution",
+      "cwd": "${workspaceFolder}/wildmagic-generator"
+    }
+  ]
+}
