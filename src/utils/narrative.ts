@@ -112,16 +112,8 @@ const INTENT_NONE_SELECTED: string[] = [
  * Generates narrative flavour text by comparing the resulting spell to
  * what the player asked for. Describes whether the power level landed
  * higher/lower/exact, and how many keywords survived the chaos.
- *
- * @param adversityGained — number of critical-fail rolls (0, 1, or 2)
- *   that grant adversity tokens back to the player.
  */
-export function getNarrative(
-  effect: Effect,
-  keywords: (string | null)[],
-  powerLevel: PowerLevel,
-  adversityGained: number = 0,
-): string {
+export function getNarrative(effect: Effect, keywords: (string | null)[], powerLevel: PowerLevel): string {
   const parts: string[] = [];
 
   // --- Intent match (how well the character's rapid thoughts shaped the result) ---
@@ -165,11 +157,8 @@ export function getNarrative(
   }
 
   // --- Adversity token gain from failed rolls ---
-  if (adversityGained === 1) {
-    parts.push("The chaos strains against your control — you gain +1 adversity token.");
-  } else if (adversityGained >= 2) {
-    parts.push("The chaos overwhelms your grip entirely — you gain +2 adversity tokens.");
-  }
+  // NOTE: The "+X adversity tokens" message is now rendered as a separate
+  // UI element below the narrative — do not inline it here.
 
   return parts.join(" ");
 }

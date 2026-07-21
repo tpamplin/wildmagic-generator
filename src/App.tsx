@@ -10,7 +10,7 @@ import { SpaceBackground } from './components/SpaceBackground';
 import { DiscoveryOverlay } from './components/DiscoveryOverlay';
 import { SpellBrowser } from './components/SpellBrowser';
 import { useDiscoveredSpells } from './hooks/useDiscoveredSpells';
-import { getEffectTags } from './utils/effectTags';
+import { getEffectTags, getPowerLabel } from './utils/effectTags';
 import { getNarrative } from './utils/narrative';
 import type { Effect } from './types/effect';
 
@@ -44,20 +44,34 @@ function App() {
     useDiscoveredSpells();
 
   const handleCast = () => {
-    const { effect, debug } = selectEffectChaos(effects, keywords, impulse, powerLevel, adversity);
-    const gained = (debug.relevanceBand === 'critFail' ? 1 : 0) + (debug.powerBand === 'critFail' ? 1 : 0);
+    const { effect } = selectEffectChaos(effects, keywords, impulse, powerLevel, adversity);
+    // Adversity tokens: +1 if power level differs from what you asked for,
+    // +1 if the spell has zero (or negative) affinity for your selected impulse.
+    let gained = 0;
+    // Compare the spell's *actual* power tier to what was requested.
+    // (Not effectivePowerLevel — that only flips on crit fail, missing
+    //  cases where e.g. a wild power roll gives you a surge on a flicker cast.)
+    if (getPowerLabel(effect.powerTier) !== powerLevel) gained += 1;
+    // Impulse check: only penalise if the spell truly has no connection
+    // to your intent, rather than requiring it to be the #1 impulse.
+    const impulseScore = effect.impulseScores[impulse] ?? 0;
+    if (impulseScore <= 0) gained += 1;
     setAdversityGained(gained);
-    if (gained > 0) {
-      setAdversity((prev) => Math.min(10, prev + gained));
-    }
-    castSpell(effect);
+    castSpell(effect, gained);
   };
 
-  /** Shared cast logic — used by both engine cast and pick-from-list cast. */
-  const castSpell = (effect: Effect) => {
+  /**
+   * Shared cast logic — used by both engine cast and pick-from-list cast.
+   * @param adversitySoFar — tokens already earned from power/impulse mismatches
+   *   before any fizzle check. On fizzle, an extra +1 is added.
+   */
+  const castSpell = (effect: Effect, adversitySoFar: number = 0) => {
     // Top-tier spells resist discovery — 2/3 chance of fizzling when unknown
     if (FIZZLE_SPELLS.has(effect.id) && !isDiscovered(effect.id)) {
       if (Math.random() < FIZZLE_CHANCE) {
+        // Fizzle awards an extra +1 adversity token on top of any mismatch tokens
+        const totalGained = adversitySoFar + 1;
+        setAdversityGained(totalGained);
         setFizzled(true);
         return;
       }
@@ -152,6 +166,11 @@ function App() {
             slipped through your grasp, sputtering into nothing. The weave trembles,
             but yields nothing… this time.
           </p>
+          {adversityGained > 0 && (
+            <div className="adversity-gained" role="status" aria-live="polite">
+              +{adversityGained} adversity {adversityGained === 1 ? 'token' : 'tokens'}
+            </div>
+          )}
           <button className="cast-again-btn" onClick={handleCastAgain}>
             CAST AGAIN
           </button>
@@ -171,8 +190,13 @@ function App() {
 
         <div className={`result-card power-border-${resultTier} result-enter`}>
           <p className="result-narrative">
-            {getNarrative(result, keywords, powerLevel, adversityGained)}
+            {getNarrative(result, keywords, powerLevel)}
           </p>
+          {adversityGained > 0 && (
+            <div className="adversity-gained" role="status" aria-live="polite">
+              +{adversityGained} adversity {adversityGained === 1 ? 'token' : 'tokens'}
+            </div>
+          )}
           <div className="spell-number known" role="status" aria-label={`Spell ${result.id}, discovered`}>
             #{result.id}
           </div>

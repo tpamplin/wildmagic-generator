@@ -42,6 +42,11 @@ body {
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
+  /* Promote to a single GPU layer so child animations don't each create
+     their own compositor surface — critical for low-end Android GPUs. */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  contain: strict;
 }
 
 .space-star {
@@ -50,24 +55,31 @@ body {
   border-radius: 50%;
   background: #fff;
   animation: starFly linear infinite;
+  /* GPU-friendly: promote each star without creating excessive layers */
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 .space-cloud {
   position: absolute;
   bottom: -20%;
-  filter: blur(40px);
+  /* Replace expensive filter:blur(40px) with a larger radial-gradient spread.
+     The gradient already feathers the edge; the blur was redundant and
+     extremely costly on mobile GPUs (Mali, older Adreno). */
   animation: cloudFly linear infinite;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
 }
 
 @keyframes starFly {
-  0%   { transform: translate(0, 0) scale(1); }
-  100% { transform: translate(-180vw, -180vh) scale(1); }
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  100% { transform: translate3d(-110vw, -110vh, 0) scale(1); }
 }
 
 @keyframes cloudFly {
-  0%   { transform: translate(0, 0); opacity: 0; }
+  0%   { transform: translate3d(0, 0, 0); opacity: 0; }
   5%   { opacity: 1; }
-  100% { transform: translate(-180vw, -180vh); opacity: 1; }
+  100% { transform: translate3d(-110vw, -110vh, 0); opacity: 1; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -413,10 +425,23 @@ body {
   font-size: 0.85rem;
   line-height: 1.65;
   color: #c4b5d0;
-  margin: 0 0 1.25rem;
-  padding-bottom: 1rem;
+  margin: 0 0 0.75rem;
+  padding-bottom: 0.75rem;
   border-bottom: 1px solid var(--border);
   font-style: italic;
+}
+
+/* ---- Adversity Gained ---- */
+
+.adversity-gained {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fbbf24;
+  text-align: center;
+  padding: 0.5rem 0 1rem;
+  margin-bottom: 0.25rem;
+  border-bottom: 1px solid var(--border);
+  animation: resultEnter 0.25s ease-out 0.12s both;
 }
 
 .spell-number {

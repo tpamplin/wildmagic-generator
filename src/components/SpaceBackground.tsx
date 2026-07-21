@@ -1,7 +1,16 @@
 import { useMemo } from 'react';
 
-const STAR_COUNT = 600;
-const CLOUD_COUNT = 24;
+/** Reduce element counts on mobile to prevent GPU compositor overload. */
+function isMobile(): boolean {
+  if (typeof window === 'undefined') return false;
+  // Touchscreen + narrow viewport = mobile device
+  return window.innerWidth < 768 && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+}
+
+const STAR_COUNT_DESKTOP = 300;
+const STAR_COUNT_MOBILE = 80;
+const CLOUD_COUNT_DESKTOP = 16;
+const CLOUD_COUNT_MOBILE = 6;
 
 interface Star {
   id: number;
@@ -67,8 +76,8 @@ function generateClouds(count: number): Cloud[] {
 }
 
 export function SpaceBackground() {
-  const stars = useMemo(() => generateStars(STAR_COUNT), []);
-  const clouds = useMemo(() => generateClouds(CLOUD_COUNT), []);
+  const stars = useMemo(() => generateStars(isMobile() ? STAR_COUNT_MOBILE : STAR_COUNT_DESKTOP), []);
+  const clouds = useMemo(() => generateClouds(isMobile() ? CLOUD_COUNT_MOBILE : CLOUD_COUNT_DESKTOP), []);
 
   return (
     <div className="space-bg" aria-hidden="true">
